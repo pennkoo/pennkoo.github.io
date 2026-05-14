@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>个人主页 - 专业简历</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; color: #333; background: #fafafa; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+    .section { padding: 80px 0; }
+    .section-title { text-align: center; font-size: 2.5rem; font-weight: 700; color: #1a1a2e; margin-bottom: 60px; position: relative; }
+    .section-title::after { content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 60px; height: 4px; background: linear-gradient(90deg, #667eea, #764ba2); border-radius: 2px; }
+    .btn { display: inline-block; padding: 12px 30px; font-size: 1rem; font-weight: 600; text-decoration: none; border-radius: 50px; transition: all 0.3s ease; border: none; cursor: pointer; }
+    .btn-primary { background: linear-gradient(90deg, #667eea, #764ba2); color: white; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4); }
+    .btn-secondary { background: transparent; color: #667eea; border: 2px solid #667eea; }
+    .btn-secondary:hover { background: #667eea; color: white; }
+    .card { background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: all 0.3s ease; }
+    .card:hover { transform: translateY(-5px); box-shadow: 0 12px 40px rgba(0,0,0,0.12); }
+
+    .navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 20px 0; background: transparent; transition: all 0.3s ease; }
+    .navbar-scrolled { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); box-shadow: 0 2px 20px rgba(0,0,0,0.1); padding: 15px 0; }
+    .navbar .container { display: flex; justify-content: space-between; align-items: center; }
+    .navbar-brand { display: flex; align-items: center; gap: 12px; }
+    .logo { width: 45px; height: 45px; background: linear-gradient(90deg, #667eea, #764ba2); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem; font-weight: 700; }
+    .navbar-nav { display: flex; list-style: none; gap: 30px; }
+    .navbar-nav a { text-decoration: none; color: #555; font-weight: 500; transition: color 0.3s ease; position: relative; }
+    .navbar-nav a:hover { color: #667eea; }
+    .navbar-nav a::after { content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 2px; background: linear-gradient(90deg, #667eea, #764ba2); transition: width 0.3s ease; }
+    .navbar-nav a:hover::after { width: 100%; }
+    .navbar-toggle { display: none; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; }
+    .navbar-toggle span { width: 25px; height: 3px; background: #333; border-radius: 2px; }
+    .mobile-menu { display: none; position: fixed; top: 70px; left: 0; right: 0; background: white; box-shadow: 0 10px 40px rgba(0,0,0,0.1); padding: 20px; }
+    .mobile-menu ul { list-style: none; display: flex; flex-direction: column; gap: 15px; }
+    .mobile-menu a { text-decoration: none; color: #333; font-weight: 500; padding: 10px; display: block; border-radius: 8px; transition: background 0.3s ease; }
+    .mobile-menu a:hover { background: #f0f0f5; }
+
+    .hero { min-height: 100vh; display: flex; align-items: center; background: linear-gradient(135deg, #667eea, #764ba2); position: relative; overflow: hidden; padding-top: 80px; }
+    .hero-content { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; position: relative; z-index: 1; }
+    .hero-text { color: white; }
+    .greeting { font-size: 1.2rem; font-weight: 500; margin-bottom: 10px; opacity: 0.9; }
+    .name { font-size: 4rem; font-weight: 700; margin-bottom: 15px; line-height: 1.2; }
+    .title { font-size: 1.5rem; font-weight: 600; margin-bottom: 20px; opacity: 0.95; }
+    .description { font-size: 1.1rem; line-height: 1.8; margin-bottom: 30px; opacity: 0.9; }
+    .hero-actions { display: flex; gap: 15px; margin-bottom: 40px; }
+    .social-links { display: flex; gap: 15px; }
+    .social-link { width: 45px; height: 45px; background: rgba(255,255,255,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; transition: all 0.3s ease; }
+    .social-link:hover { background: rgba(255,255,255,0.25); transform: translateY(-3px); }
+    .hero-image { display: flex; justify-content: center; }
+    .image-container { position: relative; }
+    .image-container img { width: 350px; height: 350px; border-radius: 24px; object-fit: cover; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+    .image-border { position: absolute; top: -10px; right: -10px; width: 100%; height: 100%; border: 3px solid rgba(255,255,255,0.3); border-radius: 24px; }
+
+    .skills { background: #fafafa; }
+    .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; margin-bottom: 60px; }
+    .skill-category { background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+    .category-title { font-size: 1.3rem; font-weight: 600; color: #1a1a2e; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f0f0f5; }
+    .skills-list { display: flex; flex-direction: column; gap: 20px; }
+    .skill-item { display: flex; flex-direction: column; gap: 8px; }
+    .skill-header { display: flex; justify-content: space-between; align-items: center; }
+    .skill-name { font-weight: 500; color: #333; }
+    .skill-level { font-size: 0.85rem; color: #667eea; font-weight: 600; background: rgba(102,126,234,0.1); padding: 3px 10px; border-radius: 20px; }
+    .skill-bar { height: 8px; background: #f0f0f5; border-radius: 4px; overflow: hidden; }
+    .skill-progress { height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); border-radius: 4px; transition: width 0.8s ease; }
+    .skills-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+    .summary-card { background: white; border-radius: 16px; padding: 25px; display: flex; align-items: center; gap: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+    .summary-icon { font-size: 2.5rem; }
+    .summary-content { display: flex; flex-direction: column; }
+    .summary-number { font-size: 1.5rem; font-weight: 700; color: #1a1a2e; }
+    .summary-label { font-size: 0.9rem; color: #888; }
+
+    .experience { background: white; }
+    .timeline { position: relative; max-width: 800px; margin: 0 auto; }
+    .timeline::before { content: ''; position: absolute; left: 20px; top: 0; bottom: 0; width: 2px; background: linear-gradient(180deg, #667eea, #764ba2); }
+    .timeline-item { position: relative; padding-left: 60px; margin-bottom: 40px; }
+    .timeline-dot { position: absolute; left: 12px; top: 25px; width: 16px; height: 16px; background: white; border: 3px solid #667eea; border-radius: 50%; }
+    .timeline-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
+    .job-title { font-size: 1.4rem; font-weight: 700; color: #1a1a2e; }
+    .company { font-size: 1rem; color: #667eea; font-weight: 600; }
+    .timeline-date { font-size: 0.9rem; color: #888; background: #f5f5f5; padding: 5px 15px; border-radius: 20px; }
+    .job-description { color: #666; line-height: 1.7; margin-bottom: 15px; }
+    .job-tags { display: flex; flex-wrap: wrap; gap: 10px; }
+    .tag { font-size: 0.85rem; padding: 5px 12px; background: rgba(102,126,234,0.1); color: #667eea; border-radius: 20px; }
+
+    .projects { background: #fafafa; }
+    .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; }
+    .project-card { overflow: hidden; }
+    .project-image { position: relative; height: 200px; overflow: hidden; }
+    .project-image img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; }
+    .project-card:hover .project-image img { transform: scale(1.05); }
+    .project-content { padding: 25px; }
+    .project-title { font-size: 1.3rem; font-weight: 700; color: #1a1a2e; margin-bottom: 10px; }
+    .project-description { color: #666; line-height: 1.6; margin-bottom: 15px; }
+    .project-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    .education { background: white; }
+    .education-timeline { max-width: 800px; margin: 0 auto 60px; }
+    .education-item { display: flex; gap: 30px; margin-bottom: 30px; }
+    .education-year { width: 120px; font-size: 1.1rem; font-weight: 700; color: #667eea; display: flex; align-items: center; }
+    .education-degree { font-size: 1.3rem; font-weight: 700; color: #1a1a2e; margin-bottom: 5px; }
+    .education-school { font-size: 1.1rem; color: #333; font-weight: 600; margin-bottom: 5px; }
+    .education-major { font-size: 0.95rem; color: #667eea; margin-bottom: 10px; }
+    .education-description { color: #666; line-height: 1.6; }
+    .certifications { margin-top: 40px; }
+    .certifications-title { font-size: 1.5rem; font-weight: 600; text-align: center; color: #1a1a2e; margin-bottom: 30px; }
+    .certifications-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+    .certification-card { background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 16px; padding: 25px; display: flex; align-items: center; gap: 15px; color: white; }
+    .cert-icon { font-size: 2.5rem; }
+    .cert-info { display: flex; flex-direction: column; }
+    .cert-name { font-weight: 600; font-size: 1.1rem; }
+    .cert-issuer { font-size: 0.85rem; opacity: 0.9; }
+
+    .hobbies { background: #fafafa; }
+    .hobbies-intro { text-align: center; max-width: 600px; margin: 0 auto 50px; font-size: 1.1rem; color: #666; line-height: 1.7; }
+    .hobbies-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; margin-bottom: 60px; }
+    .hobby-card { background: white; border-radius: 16px; padding: 30px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+    .hobby-icon { font-size: 3.5rem; margin-bottom: 15px; }
+    .hobby-title { font-size: 1.2rem; font-weight: 600; color: #1a1a2e; margin-bottom: 10px; }
+    .hobby-description { color: #666; line-height: 1.6; }
+    .fun-facts { background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 20px; padding: 40px; }
+    .fun-facts-title { font-size: 1.5rem; font-weight: 600; color: white; text-align: center; margin-bottom: 30px; }
+    .fun-facts-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+    .fun-fact { display: flex; align-items: center; gap: 10px; color: white; }
+    .fact-icon { font-size: 1.3rem; }
+    .fact-text { font-size: 0.95rem; opacity: 0.95; }
+
+    .contact { background: white; }
+    .contact-content { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; max-width: 900px; margin: 0 auto; }
+    .contact-title { font-size: 1.5rem; font-weight: 700; color: #1a1a2e; margin-bottom: 15px; }
+    .contact-description { color: #666; line-height: 1.7; margin-bottom: 30px; }
+    .contact-details { display: flex; flex-direction: column; gap: 20px; }
+    .contact-item { display: flex; gap: 15px; align-items: center; }
+    .contact-icon { font-size: 1.5rem; }
+    .contact-text { display: flex; flex-direction: column; }
+    .contact-label { font-size: 0.85rem; color: #888; }
+    .contact-value { font-weight: 500; color: #333; text-decoration: none; }
+    .contact-value:hover { color: #667eea; }
+    .contact-form { background: #fafafa; border-radius: 16px; padding: 35px; }
+    .form-title { font-size: 1.3rem; font-weight: 600; color: #1a1a2e; margin-bottom: 25px; }
+    .form-group { margin-bottom: 20px; }
+    .form-group input, .form-group textarea { width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1rem; font-family: inherit; transition: all 0.3s ease; }
+    .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
+    .contact-form .btn { width: 100%; padding: 15px; font-size: 1.1rem; }
+
+    .footer { background: #1a1a2e; color: white; padding: 50px 0 20px; }
+    .footer-content { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; margin-bottom: 40px; }
+    .footer-brand { display: flex; flex-direction: column; gap: 10px; }
+    .brand-name { font-size: 1.3rem; font-weight: 700; }
+    .brand-description { color: #888; font-size: 0.95rem; }
+    .footer-links h4, .footer-social h4 { font-size: 1rem; font-weight: 600; margin-bottom: 15px; }
+    .footer-links ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-links a { color: #888; text-decoration: none; transition: color 0.3s ease; }
+    .footer-links a:hover { color: #667eea; }
+    .social-icons { display: flex; gap: 15px; }
+    .social-icon { width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; transition: all 0.3s ease; }
+    .social-icon:hover { background: #667eea; transform: translateY(-3px); }
+    .footer-bottom { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; text-align: center; color: #888; font-size: 0.9rem; }
+
+    @media (max-width: 768px) {
+      .hero-content { grid-template-columns: 1fr; text-align: center; gap: 40px; }
+      .name { font-size: 2.5rem; }
+      .hero-actions, .social-links { justify-content: center; }
+      .image-container img { width: 280px; height: 280px; }
+      .skills-grid, .projects-grid, .certifications-grid { grid-template-columns: 1fr; }
+      .timeline-header, .education-item { flex-direction: column; gap: 10px; }
+      .education-year { width: auto; }
+      .contact-content { grid-template-columns: 1fr; }
+      .navbar-nav { display: none; }
+      .navbar-toggle { display: flex; }
+      .mobile-menu-active { display: block; }
+      .section-title { font-size: 2rem; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar" id="navbar">
+    <div class="container">
+      <div class="navbar-brand">
+        <div class="logo">PK</div>
+        <span class="name">Penn Koo</span>
+      </div>
+      <ul class="navbar-nav">
+        <li><a href="#skills">技能</a></li>
+        <li><a href="#experience">工作经历</a></li>
+        <li><a href="#projects">项目</a></li>
+        <li><a href="#education">教育</a></li>
+        <li><a href="#hobbies">兴趣</a></li>
+        <li><a href="#contact">联系</a></li>
+      </ul>
+      <button class="navbar-toggle" id="navbar-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div class="mobile-menu" id="mobile-menu">
+      <ul>
+        <li><a href="#skills">技能</a></li>
+        <li><a href="#experience">工作经历</a></li>
+        <li><a href="#projects">项目</a></li>
+        <li><a href="#education">教育</a></li>
+        <li><a href="#hobbies">兴趣</a></li>
+        <li><a href="#contact">联系</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-text">
+          <div class="greeting">你好，我是</div>
+          <h1 class="name">Penn Koo</h1>
+          <p class="title">全栈工程师 / 技术爱好者</p>
+          <p class="description">拥有5年以上互联网行业经验，专注于Web开发和系统架构。热爱技术，追求卓越，善于解决复杂问题，致力于创造有价值的产品。</p>
+          <div class="hero-actions">
+            <a href="#contact" class="btn btn-primary">联系我</a>
+            <a href="#projects" class="btn btn-secondary">查看项目</a>
+          </div>
+          <div class="social-links">
+            <a href="#" class="social-link">领</a>
+            <a href="#" class="social-link">G</a>
+            <a href="#" class="social-link">T</a>
+            <a href="#" class="social-link">邮</a>
+          </div>
+        </div>
+        <div class="hero-image">
+          <div class="image-container">
+            <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=professional%20portrait%20photo%20of%20a%20young%20asian%20software%20engineer%20in%20business%20casual%20attire%20smiling%20confidently%20clean%20background&image_size=square" alt="个人照片" />
+            <div class="image-border"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="skills" class="section skills">
+    <div class="container">
+      <h2 class="section-title">专业技能</h2>
+      <div class="skills-grid">
+        <div class="skill-category">
+          <h3 class="category-title">前端开发</h3>
+          <div class="skills-list">
+            <div class="skill-item"><div class="skill-header"><span class="skill-name">JavaScript / TypeScript</span><span class="skill-level">精通</span></div><div class="skill-bar"><div class="skill-progress" style="width:95%"></div></div></div>
+            <div class="skill-item"><div class="skill-header"><span class="skill-name">Vue.js / React</span><span class="skill-level">精通</span></div><div class="skill-bar"><div class="skill-progress" style="width:90%"></div></div></div>
+            <div class="skill-item"><div class="skill-header"><span class="skill-name">HTML5 / CSS3</span><span class="skill-level">精通</span></div><div class="skill-bar"><div class="skill-progress" style="width:95%"></div></div></div>
+            <div class="skill-item"><div class="skill-header"><span class="skill-name">Tailwind CSS / SCSS</span><span class="skill-level">熟练</span></div><div class="skill-bar"><div class="skill-progress" style="width:85%"></div></div></div>
+            <div class="skill-item"><div class="skill-header"><span class="skill-name">Webpack / Vite</span><span class="skill-level">熟练</span></div><div class="skill-bar"><div class="skill-progress" style="width:80%"></div></div></div>
+          </div>
+        </div>
+        <div class="skill-category">
+          <h3 class="category-title">后端开发</h3>
+          <div class="skills-list">
+            <div class="skill-item"><div class="skill-header"><span class="skill-name">Node.js / Express</span><span class="skill-level">精通</span></div><div class="skill-bar"><div class="skill-progress" style="width:90%"></div></div></div>
+            <div class="skill-item"><div class="skill-header"><span class="skill-name">Python / Django</span><span class="skill-level">熟练</span></div><div class="skill-bar"><div class="skill-progress" style="width:80%"></div></div></div>
+            <div class="skill-header"><span class="skill-name">RESTful API</span><span class="skill-level">精通</span></div><div class="skill-bar"><div class="skill-progress" style="width:95%"></div></div>
+            <div class="skill-item"><div class="skill-header"><span class="skill-name">GraphQL</span><span class="skill-level">熟练</span></div><div class="skill-bar"><div class="skill-progress" style="width:75%"></div></div></div>
+            <div class="skill-item"><div class="skill-header"><span class="skill-name">微服务架构</span><span class="skill-level">熟练</span></div><div class="skill-bar"><div class="skill-progress" style="width:70%"></div></div></div>
+          </div>
+        </div>
+        <div class="skill-category">
+          <h3 class="category-title">数据库与工具</h3>
+          <div class="skills-list">
+            <div class="skill-item"><div class="skill-header"><span class="skill-name">MySQL / PostgreSQL</span><span class="skill-level">精通</span></div><div class="skill-bar"><div class="skill-progress" style="width:90%"></div></div></div>
+            <div class="skill-item"><div class="skill-header"><span class="skill-name">MongoDB</span><span class="skill-level">熟练</span></div><div class="skill-bar"><div class="skill-progress" style="width:80%"></div></div></div>
+            <div class="skill-item"><div class="skill-header"><span class="skill-name">Redis</span><span class="skill-level">熟练</span></div><div class="skill-bar"><div class="skill-progress" style="width:75%"></div></div></div>
+            <div class="skill-item"><div class="skill-header"><span class="skill-name">Git / GitHub</span><span class="skill-level">精通</span></div><div class="skill-bar"><div class="skill-progress" style="width:95%"></div></div></div>
+            <div class="skill-item"><div class="skill-header"><span class="skill-name">Docker</span><span class="skill-level">熟练</span></div><div class="skill-bar"><div class="skill-progress" style="width:70%"></div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="skills-summary">
+        <div class="summary-card"><div class="summary-icon">🚀</div><div class="summary-content"><div class="summary-number">5+</div><div class="summary-label">年开发经验</div></div></div>
+        <div class="summary-card"><div class="summary-icon">💻</div><div class="summary-content"><div class="summary-number">50+</div><div class="summary-label">完成项目</div></div></div>
+        <div class="summary-card"><div class="summary-icon">⭐</div><div class="summary-content"><div class="summary-number">100%</div><div class="summary-label">客户满意度</div></div></div>
+        <div class="summary-card"><div class="summary-icon">🎯</div><div class="summary-content"><div class="summary-number">24/7</div><div class="summary-label">学习态度</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="experience" class="section experience">
+    <div class="container">
+      <h2 class="section-title">工作经历</h2>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content card">
+            <div class="timeline-header">
+              <div><h3 class="job-title">高级前端工程师</h3><p class="company">科技创新有限公司</p></div>
+              <span class="timeline-date">2022 - 至今</span>
+            </div>
+            <p class="job-description">负责公司核心产品的前端架构设计和开发，带领团队完成多个大型项目。主导前端技术栈升级，引入Vue3和TypeScript，提升开发效率和代码质量。</p>
+            <div class="job-tags"><span class="tag">Vue3</span><span class="tag">TypeScript</span><span class="tag">微前端</span><span class="tag">性能优化</span></div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content card">
+            <div class="timeline-header">
+              <div><h3 class="job-title">全栈开发工程师</h3><p class="company">互联网创业公司</p></div>
+              <span class="timeline-date">2020 - 2022</span>
+            </div>
+            <p class="job-description">独立负责多个项目的全栈开发，从需求分析到上线部署全程参与。设计并实现了公司核心业务系统，包括用户管理、数据分析和报表系统。</p>
+            <div class="job-tags"><span class="tag">Node.js</span><span class="tag">React</span><span class="tag">MongoDB</span><span class="tag">AWS</span></div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content card">
+            <div class="timeline-header">
+              <div><h3 class="job-title">前端开发工程师</h3><p class="company">知名互联网企业</p></div>
+              <span class="timeline-date">2019 - 2020</span>
+            </div>
+            <p class="job-description">参与公司旗舰产品的开发和维护，负责前端页面开发、组件封装和性能优化。与产品经理和设计师紧密协作，完成多个重要功能模块。</p>
+            <div class="job-tags"><span class="tag">Vue2</span><span class="tag">JavaScript</span><span class="tag">Webpack</span><span class="tag">UI组件</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="projects" class="section projects">
+    <div class="container">
+      <h2 class="section-title">项目作品</h2>
+      <div class="projects-grid">
+        <div class="project-card card">
+          <div class="project-image"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=modern%20ecommerce%20dashboard%20interface%20with%20charts%20and%20data%20visualization%20clean%20UI%20design&image_size=landscape_16_9" alt="项目1"></div>
+          <div class="project-content">
+            <h3 class="project-title">电商平台管理系统</h3>
+            <p class="project-description">基于Vue3 + Node.js构建的全栈电商管理平台，支持商品管理、订单处理、数据分析等功能。</p>
+            <div class="project-tags"><span class="tag">Vue3</span><span class="tag">Node.js</span><span class="tag">MongoDB</span><span class="tag">ECharts</span></div>
+          </div>
+        </div>
+        <div class="project-card card">
+          <div class="project-image"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=CRM%20customer%20relationship%20management%20system%20dashboard%20professional%20UI%20design&image_size=landscape_16_9" alt="项目2"></div>
+          <div class="project-content">
+            <h3 class="project-title">企业级CRM系统</h3>
+            <p class="project-description">客户关系管理系统，包含客户管理、销售跟踪、报表分析等模块，帮助企业提升客户服务效率。</p>
+            <div class="project-tags"><span class="tag">React</span><span class="tag">Python</span><span class="tag">PostgreSQL</span><span class="tag">Redux</span></div>
+          </div>
+        </div>
+        <div class="project-card card">
+          <div class="project-image"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=online%20education%20learning%20platform%20interface%20colorful%20modern%20design&image_size=landscape_16_9" alt="项目3"></div>
+          <div class="project-content">
+            <h3 class="project-title">在线教育平台</h3>
+            <p class="project-description">面向K12学生的在线学习平台，支持视频课程、在线测验、学习进度追踪等功能。</p>
+            <div class="project-tags"><span class="tag">Vue3</span><span class="tag">TypeScript</span><span class="tag">MySQL</span><span class="tag">WebSocket</span></div>
+          </div>
+        </div>
+        <div class="project-card card">
+          <div class="project-image"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=data%20analytics%20dashboard%20with%20charts%20graphs%20modern%20dark%20theme&image_size=landscape_16_9" alt="项目4"></div>
+          <div class="project-content">
+            <h3 class="project-title">智能数据分析工具</h3>
+            <p class="project-description">数据可视化分析平台，支持多种数据源接入，提供丰富的图表和报表功能。</p>
+            <div class="project-tags"><span class="tag">React</span><span class="tag">Node.js</span><span class="tag">Elasticsearch</span><span class="tag">D3.js</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="education" class="section education">
+    <div class="container">
+      <h2 class="section-title">教育背景</h2>
+      <div class="education-timeline">
+        <div class="education-item">
+          <div class="education-year">2015 - 2019</div>
+          <div class="education-card card">
+            <h3 class="education-degree">学士学位</h3>
+            <p class="education-school">北京大学</p>
+            <p class="education-major">计算机科学与技术</p>
+            <p class="education-description">主修课程：数据结构、算法设计、操作系统、数据库原理、人工智能等。在校期间成绩优异，多次获得奖学金。</p>
+          </div>
+        </div>
+        <div class="education-item">
+          <div class="education-year">2019 - 2021</div>
+          <div class="education-card card">
+            <h3 class="education-degree">硕士学位</h3>
+            <p class="education-school">清华大学</p>
+            <p class="education-major">软件工程</p>
+            <p class="education-description">研究方向：分布式系统与云计算。参与多项国家级科研项目，发表学术论文3篇。</p>
+          </div>
+        </div>
+      </div>
+      <div class="certifications">
+        <h3 class="certifications-title">专业认证</h3>
+        <div class="certifications-grid">
+          <div class="certification-card"><div class="cert-icon">🏆</div><div class="cert-info"><div class="cert-name">AWS Solutions Architect</div><div class="cert-issuer">Amazon Web Services</div></div></div>
+          <div class="certification-card"><div class="cert-icon">⭐</div><div class="cert-info"><div class="cert-name">Google Cloud Professional</div><div class="cert-issuer">Google Cloud</div></div></div>
+          <div class="certification-card"><div class="cert-icon">💼</div><div class="cert-info"><div class="cert-name">PMP项目管理认证</div><div class="cert-issuer">Project Management Institute</div></div></div>
+          <div class="certification-card"><div class="cert-icon">📚</div><div class="cert-info"><div class="cert-name">Scrum Master</div><div class="cert-issuer">Scrum Alliance</div></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="hobbies" class="section hobbies">
+    <div class="container">
+      <h2 class="section-title">兴趣爱好</h2>
+      <p class="hobbies-intro">工作之余，我热爱探索生活的方方面面，这些兴趣爱好不仅丰富了我的生活，也让我成为一个更全面的人。</p>
+      <div class="hobbies-grid">
+        <div class="hobby-card"><div class="hobby-icon">🎸</div><h3 class="hobby-title">音乐</h3><p class="hobby-description">喜欢弹吉他和唱歌，音乐是我放松的最佳方式，也让我更有创造力。</p></div>
+        <div class="hobby-card"><div class="hobby-icon">📚</div><h3 class="hobby-title">阅读</h3><p class="hobby-description">广泛阅读技术书籍和科幻小说，不断学习新知识，拓宽视野。</p></div>
+        <div class="hobby-card"><div class="hobby-icon">🏃</div><h3 class="hobby-title">运动</h3><p class="hobby-description">热爱跑步和健身，健康的身体是高效工作的基础。</p></div>
+        <div class="hobby-card"><div class="hobby-icon">🌍</div><h3 class="hobby-title">旅行</h3><p class="hobby-description">喜欢探索不同的文化和风景，旅行让我更加开放和包容。</p></div>
+        <div class="hobby-card"><div class="hobby-icon">🎨</div><h3 class="hobby-title">绘画</h3><p class="hobby-description">业余时间喜欢画画，用色彩表达自己的想法和感受。</p></div>
+        <div class="hobby-card"><div class="hobby-icon">🎮</div><h3 class="hobby-title">游戏</h3><p class="hobby-description">喜欢策略类游戏，锻炼逻辑思维和团队协作能力。</p></div>
+      </div>
+      <div class="fun-facts">
+        <h3 class="fun-facts-title">关于我</h3>
+        <div class="fun-facts-list">
+          <div class="fun-fact"><span class="fact-icon">🌱</span><span class="fact-text">每天坚持学习新东西</span></div>
+          <div class="fun-fact"><span class="fact-icon">☕</span><span class="fact-text">咖啡爱好者，每天至少两杯</span></div>
+          <div class="fun-fact"><span class="fact-icon">📝</span><span class="fact-text">技术博客作者，分享技术心得</span></div>
+          <div class="fun-fact"><span class="fact-icon">🐶</span><span class="fact-text">铲屎官一枚，家里有两只可爱的猫咪</span></div>
+          <div class="fun-fact"><span class="fact-icon">🍳</span><span class="fact-text">喜欢烹饪，擅长做各种美食</span></div>
+          <div class="fun-fact"><span class="fact-icon">🎯</span><span class="fact-text">目标：每年学会一项新技能</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="section contact">
+    <div class="container">
+      <h2 class="section-title">联系我</h2>
+      <div class="contact-content">
+        <div>
+          <h3 class="contact-title">期待与您交流</h3>
+          <p class="contact-description">如果您有任何合作机会、工作邀请或只是想打个招呼，欢迎随时联系我！</p>
+          <div class="contact-details">
+            <div class="contact-item"><span class="contact-icon">📧</span><div class="contact-text"><span class="contact-label">邮箱</span><a href="mailto:penn.koo@example.com" class="contact-value">penn.koo@example.com</a></div></div>
+            <div class="contact-item"><span class="contact-icon">📱</span><div class="contact-text"><span class="contact-label">电话</span><a href="tel:+8613800000000" class="contact-value">+86 138-0000-0000</a></div></div>
+            <div class="contact-item"><span class="contact-icon">📍</span><div class="contact-text"><span class="contact-label">地址</span><span class="contact-value">北京市朝阳区科技园区</span></div></div>
+            <div class="contact-item"><span class="contact-icon">💼</span><div class="contact-text"><span class="contact-label">LinkedIn</span><a href="#" class="contact-value">linkedin.com/in/pennkoo</a></div></div>
+          </div>
+        </div>
+        <form class="contact-form" onsubmit="handleSubmit(event)">
+          <h3 class="form-title">发送消息</h3>
+          <div class="form-group"><input type="text" placeholder="您的姓名" required></div>
+          <div class="form-group"><input type="email" placeholder="您的邮箱" required></div>
+          <div class="form-group"><input type="text" placeholder="主题"></div>
+          <div class="form-group"><textarea placeholder="您的消息内容..." rows="5" required></textarea></div>
+          <button type="submit" class="btn btn-primary">发送消息</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <div class="logo">PK</div>
+          <div class="brand-name">Penn Koo</div>
+          <div class="brand-description">全栈工程师 | 技术爱好者 | 终身学习者</div>
+        </div>
+        <div class="footer-links">
+          <h4>快速链接</h4>
+          <ul>
+            <li><a href="#skills">技能</a></li>
+            <li><a href="#experience">工作经历</a></li>
+            <li><a href="#projects">项目</a></li>
+            <li><a href="#contact">联系</a></li>
+          </ul>
+        </div>
+        <div class="footer-social">
+          <h4>社交媒体</h4>
+          <div class="social-icons">
+            <a href="#" class="social-icon">领</a>
+            <a href="#" class="social-icon">G</a>
+            <a href="#" class="social-icon">T</a>
+            <a href="#" class="social-icon">邮</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 Penn Koo. 保留所有权利。</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const navbar = document.getElementById('navbar');
+    const navbarToggle = document.getElementById('navbar-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('navbar-scrolled', window.scrollY > 50);
+    });
+
+    navbarToggle.addEventListener('click', () => {
+      mobileMenu.classList.toggle('mobile-menu-active');
+    });
+
+    document.querySelectorAll('.mobile-menu a').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.remove('mobile-menu-active');
+      });
+    });
+
+    function handleSubmit(event) {
+      event.preventDefault();
+      alert('消息已发送！感谢您的联系，我会尽快回复。');
+      event.target.reset();
+    }
+  </script>
+</body>
+</html>
